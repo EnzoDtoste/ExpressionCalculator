@@ -47,11 +47,15 @@ namespace Advanced_Calculator
             
             InitializeComponent();
 
-            Expression expression = Expression.CreateExpression("2 * x^2", operators, less_priority);
+            Expression expression = Expression.CreateExpression("15 + 27*x", operators, less_priority);
 
             textBox1.Text = (expression.ToString(less_priority));
 
-            Expression expression1 = expression.Derivate('x').Evaluate(new Dictionary<char, double>());
+            Dictionary<char, double> d = new Dictionary<char, double>();
+
+            d.Add('x', 10);
+
+            Expression expression1 = expression.Evaluate(d);
 
             textBox2.Text = (expression1.ToString(less_priority));
 

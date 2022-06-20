@@ -4,12 +4,14 @@
     public abstract class Expression
     {
         
+        //indicador de operación, constante o variable
         public string visual;
         protected Expression(string visual)
         {
             this.visual = visual;
         }
 
+        //dada una cadena halla el operador con menos prioridad más externo
         public static Expression CreateExpression(string expression, List<Expression> operators, List<string>[] less_priority)
         {
 
@@ -18,36 +20,43 @@
             int[] indexes = new int[operators.Count];
 
             for (int i = 0; i < operators.Count; i++)
-                indexes[i] = IndexOf(expression, operators[i].visual, 0);
+                indexes[i] = IndexOf(expression, expression, operators[i].visual, 0);
 
             int max = -1;
             int max_index = -1;
 
+            //recorre de menor prioridad a mayor
             foreach (var equal in less_priority)
             {
 
                 foreach (var op in equal)
                 {
 
+                    //ubica el operador en la colección
                     int index = indexInColl(operators, op);
 
+                    //si el operador con igual prioridad está más lejano me quedo con él
                     if (indexes[index] > max)
                     { max = indexes[index]; max_index = index; }
 
                 }
 
+                //si en esta prioridad encontré alguno ya rompo el ciclo
                 if (max != -1)
                     break;
 
             }
 
+            //si nunca encontré un operador es una constante o una variable
             if (max == -1)
                 return new ConstantOrVariable(expression);
 
+            //extraigo esa operación de la expresión
             return operators[max_index].ExtractExpression(expression, max, operators, less_priority);
 
         }
 
+        //indice de una operación en la colección
         private static int indexInColl(List<Expression> operators, string visual)
         {
             for(int i = 0; i < operators.Count; i++)
@@ -58,18 +67,19 @@
             return -1;
         }
 
-        private static int IndexOf(string expression, string visual, int arrastre)
+        //ultima posición de un operador en una expresión que no esté dentro de un paréntesis
+        private static int IndexOf(string expression, string subexpression, string visual, int arrastre)
         {
 
-            int indexof = expression.IndexOf(visual);
+            int indexof = subexpression.IndexOf(visual);
 
             if (indexof != -1)
             {
 
-                if (!IsInP(expression, indexof))
-                    return Math.Max(arrastre + indexof, arrastre + IndexOf(expression.Substring(indexof + 1), visual, arrastre + indexof + 1));
+                if (!IsInP(expression, arrastre + indexof))
+                    return Math.Max(arrastre + indexof, arrastre + IndexOf(expression, subexpression.Substring(indexof + 1), visual, arrastre + indexof + 1));
 
-                return IndexOf(expression.Substring(indexof + 1), visual, arrastre + indexof + 1);
+                return IndexOf(expression, subexpression.Substring(indexof + 1), visual, arrastre + indexof + 1);
 
             }
 
@@ -77,6 +87,7 @@
 
         }
 
+        //si una operación está dentro de un paréntesis
         private static bool IsInP(string expression, int index)
         {
 
@@ -94,6 +105,7 @@
 
         }
 
+        //si es una variable específica
         protected bool IsVariable(string value, string variable)
         {
             try
@@ -103,6 +115,7 @@
             }
             catch { return value == variable; }
         }
+        //si es una variable
         protected bool IsVariable(string value)
         {
             try
@@ -113,12 +126,16 @@
             catch { return true; }
         }
 
+        //cada operación debe saber extraerse de una expresión
         protected abstract Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority);
 
+        //cada operación debe saber como imprimirse
         public abstract string ToString(List<string>[] less_priority);
 
+        //cada operación debe saber como evaluarse
         public abstract Expression Evaluate(Dictionary<char, double> variables);
 
+        //cada operación debe saber como derivarse
         public abstract Expression Derivate(char variable);
     }
 
@@ -177,9 +194,11 @@
 
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
-            if(variables.ContainsKey(Convert.ToChar(visual)))
-                return new ConstantOrVariable(variables[Convert.ToChar(visual)].ToString());
+            //si es una variable devuelvo su evaluación
+            if(variables.ContainsKey(visual[0]))
+                return new ConstantOrVariable(variables[visual[0]].ToString());
 
+            //es una constante por lo tanto la devuelvo así mismo
             return this;
         }
     }
@@ -196,6 +215,7 @@
             Expression right;
             Expression left;
 
+            //si hay paréntesis externos los elimino
             if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
                 right = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
 
@@ -223,9 +243,11 @@
             Expression newLeft = left.Evaluate(variables);
             Expression newRight = right.Evaluate(variables);
 
+            //si son constantes sumo
             if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
                 return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) + double.Parse(newRight.visual.ToString())).ToString());
 
+            //reduzco
             if (newLeft.visual == "0")
                 return newRight;
 
@@ -292,6 +314,7 @@
             else
                 right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
 
+            //si la izquierda no existe entonces es un (-1 *)
             try
             {
 
@@ -448,12 +471,15 @@
         public override Expression Derivate(char variable)
         {
             
+            //si el exponente es una constante deriva como x^a
             if (right is ConstantOrVariable && !IsVariable(right.visual, variable.ToString()))
                 return new Multiply("*", new Multiply("*", right, new Exponent("^", left, new Minus("-", right, new ConstantOrVariable("1")))), left.Derivate(variable));
 
+            //si la base es una constante deriva como a^x
             if (left is ConstantOrVariable && !IsVariable(left.visual, variable.ToString()))
                 return new Multiply("*", new Multiply("*", this, new Ln("ln", left)), right.Derivate(variable));
 
+            //si ambas son variables deriva como e^((exp)*ln(base))
             return new Exponent("^", new ConstantOrVariable("e"), new Multiply("*", right, new Ln("ln", left))).Derivate(variable);
 
         }
@@ -587,9 +613,6 @@
             if (newRight.visual == "1")
                 return new ConstantOrVariable("0");
 
-            if (newRight.ToString() == newLeft.ToString())
-                return new ConstantOrVariable("1");
-
             return new Log("log", newLeft, newRight);
 
         }
@@ -612,6 +635,7 @@
 
                 string[] parts = expression.Split(',');
 
+                //si se especifica la base
                 if (parts.Length == 2)
                 {
 
@@ -629,6 +653,7 @@
 
                 }
 
+                //sino es 10
                 else
                 {
 
@@ -639,6 +664,7 @@
 
             }
 
+            //la base es 10
             else
             {
 
@@ -706,6 +732,7 @@
 
                 string[] parts = expression.Split(',');
 
+                //si se especifica el indice del radical
                 if (parts.Length == 2)
                 {
 
@@ -723,6 +750,7 @@
 
                 }
 
+                //sino es 2
                 else
                 {
 
@@ -733,6 +761,7 @@
 
             }
 
+            //el indice del radical es 2
             else
             {
 
