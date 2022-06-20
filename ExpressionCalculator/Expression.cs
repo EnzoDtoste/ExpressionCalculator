@@ -116,7 +116,15 @@
         protected abstract Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority);
 
         public abstract string ToString(List<string>[] less_priority);
-
+        public override string ToString()
+        {
+            return visual;
+        }
+        public double ToDouble()
+        {
+            string exp = this.ToString();
+            return Double.Parse(exp);
+        }
         public abstract Expression Evaluate(Dictionary<char, double> variables);
 
         public abstract Expression Derivate(char variable);
@@ -174,7 +182,7 @@
         {
             return visual;
         }
-
+        
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
             if(variables.ContainsKey(Convert.ToChar(visual)))
@@ -182,6 +190,7 @@
 
             return this;
         }
+        
     }
 
     public class Sum : BinaryExpression
