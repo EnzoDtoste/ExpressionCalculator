@@ -77,7 +77,7 @@
             {
 
                 if (!IsInP(expression, arrastre + indexof))
-                    return Math.Max(arrastre + indexof, arrastre + IndexOf(expression, subexpression.Substring(indexof + 1), visual, arrastre + indexof + 1));
+                    return Math.Max(arrastre + indexof, IndexOf(expression, subexpression.Substring(indexof + 1), visual, arrastre + indexof + 1));
 
                 return IndexOf(expression, subexpression.Substring(indexof + 1), visual, arrastre + indexof + 1);
 
