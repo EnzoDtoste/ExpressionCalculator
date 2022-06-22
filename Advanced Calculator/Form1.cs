@@ -4,7 +4,7 @@ namespace Advanced_Calculator
 {
     public partial class Form1 : Form
     {
-        int oo = 0;
+        
         List<Expression> operators = new List<Expression>()
         {
 
