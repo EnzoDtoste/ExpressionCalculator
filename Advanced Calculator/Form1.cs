@@ -47,7 +47,7 @@ namespace Advanced_Calculator
             
             InitializeComponent();
 
-            Expression expression = Expression.CreateExpression("x^2 + x^3 + y + e^x", operators, less_priority);
+            Expression expression = Expression.CreateExpression("5 * 1/(3 + 2)", operators, less_priority);
 
             textBox1.Text = (expression.ToString(less_priority));
 
