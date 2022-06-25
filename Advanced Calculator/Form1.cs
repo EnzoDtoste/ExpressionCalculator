@@ -38,7 +38,9 @@ namespace Advanced_Calculator
             new List<string>() { "+", "-" },
             new List<string>() { "*", "/" },
             new List<string>() { "^" },
-            new List<string>() { "ln", "log", "!", "root", "sen", "cos", "tan", "cot", "sec", "csc", "arcsen", "arccos", "arctan", "arccot", "arcsec", "arccsc" }
+            new List<string>() { "arcsen", "arccos", "arctan", "arccot", "arcsec", "arccsc" },
+            new List<string>() { "sen", "cos", "tan", "cot", "sec", "csc" },
+            new List<string>() { "ln", "log", "!", "root" }
 
         };
 
@@ -47,15 +49,18 @@ namespace Advanced_Calculator
             
             InitializeComponent();
 
-            Expression expression = Expression.CreateExpression("5 * 1/(3 + 2)", operators, less_priority);
+        }
 
-            textBox1.Text = (expression.ToString(less_priority));
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            Expression expression = Expression.CreateExpression(textBox1.Text, operators, less_priority);
 
             Dictionary<char, double> d = new Dictionary<char, double>();
 
-            //d.Add('x', 10);
+            //d.Add('x', 0);
 
-            Expression expression1 = expression.Derivate('x').Evaluate(d);
+            Expression expression1 = expression.Evaluate(d);
 
             textBox2.Text = (expression1.ToString(less_priority));
 
