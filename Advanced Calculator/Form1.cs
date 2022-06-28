@@ -49,13 +49,16 @@ namespace Advanced_Calculator
             
             InitializeComponent();
 
-            Expression expression = Expression.CreateExpression("15 + 27*x", operators, less_priority);
+        }
 
-            textBox1.Text = (expression.ToString(less_priority));
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            Expression expression = Expression.CreateExpression(textBox1.Text, operators, less_priority);
 
             Dictionary<char, double> d = new Dictionary<char, double>();
 
-            d.Add('x', 10);
+            //d.Add('x', 0);
 
             Expression expression1 = expression.Evaluate(d);
 

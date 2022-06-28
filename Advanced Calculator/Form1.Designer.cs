@@ -48,6 +48,7 @@
             this.textBox2.Size = new System.Drawing.Size(284, 27);
             this.textBox2.TabIndex = 1;
             // 
+<<<<<<< HEAD
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.White;

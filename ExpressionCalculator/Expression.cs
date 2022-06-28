@@ -17,6 +17,8 @@
 
             expression = expression.Replace(" ", "");
 
+            expression = RemoveExternalP(expression);
+
             int[] indexes = new int[operators.Count];
 
             for (int i = 0; i < operators.Count; i++)
@@ -53,6 +55,41 @@
 
             //extraigo esa operación de la expresión
             return operators[max_index].ExtractExpression(expression, max, operators, less_priority);
+
+        }
+
+        //remueve los parentesis externos
+        private static string RemoveExternalP(string expression)
+        {
+
+            if(expression[0] == '(' && expression[expression.Length - 1] == ')')
+            {
+
+                string temp = expression.Substring(1, expression.Length - 2);
+
+                int count = 0;
+
+                foreach(char c in temp)
+                {
+                  
+                    if (c == '(')
+                        count++;
+                    if (c == ')')
+                        count--;
+
+                    if (count < 0)
+                        return expression;
+
+                }
+
+                if (count == 0)
+                    return temp;
+
+                return expression;
+
+            }
+
+            return expression;
 
         }
 
@@ -126,6 +163,53 @@
             catch { return true; }
         }
 
+        /// <summary>
+        /// returns if a have less or equal priority than b
+        /// </summary>
+        /// <param name="less_priority"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="equal"> include equal case </param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public bool IsLessOrEqualPriority(List<string>[] less_priority, string a, string b, bool equal)
+        {
+
+            foreach(var item in less_priority)
+            {
+
+                bool found_a = false;
+                bool found_b = false;
+
+                foreach(var e in item)
+                {
+
+                    if (e == a)
+                        found_a = true;
+
+                    if(e == b)
+                        found_b = true;
+
+                }
+
+                if (found_a && found_b && equal)
+                    return true;
+
+                else if (found_a && found_b && !equal)
+                    return false;
+
+                if (found_a)
+                    return true;
+
+                if (found_b)
+                    return false;
+
+            }
+
+            throw new ArgumentException("does operators does not exist");
+
+        }
+
         //cada operación debe saber extraerse de una expresión
         protected abstract Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority);
 
@@ -169,6 +253,25 @@
         public UnaryExpression(string visual, Expression content) : base(visual)
         {
             this.content = content;
+        }
+
+        public override string ToString(List<string>[] less_priority)
+        {
+            if (content is ConstantOrVariable)
+                return visual + content.ToString(less_priority);
+
+            return visual + "(" + content.ToString(less_priority) + ")";
+        }
+
+        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
+        {
+            
+            Expression content;
+
+            content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
+
+            return (Expression)Activator.CreateInstance(this.GetType(), visual, content);
+
         }
 
     }
@@ -225,18 +328,8 @@
             Expression right;
             Expression left;
 
-            //si hay paréntesis externos los elimino
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                right = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            if (expression[index - 1] == ')' && expression[0] == '(')
-                left = CreateExpression(expression.Substring(1, index - 2), operators, less_priority);
-
-            else
-                left = CreateExpression(expression.Substring(0, index), operators, less_priority);
+            right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
+            left = CreateExpression(expression.Substring(0, index), operators, less_priority);
 
             return new Sum(visual, left, right);
 
@@ -244,7 +337,25 @@
 
         public override string ToString(List<string>[] less_priority)
         {
-            return "(" + left.ToString(less_priority) + ") " + visual + " (" + right.ToString(less_priority) + ")";
+
+            string result = "";
+
+            if (left is ConstantOrVariable || IsLessOrEqualPriority(less_priority, visual, left.visual, true))
+                result += left.ToString(less_priority);
+
+            else
+                result += "(" + left.ToString(less_priority) + ")";
+
+            result += " " + visual;
+
+            if (right is ConstantOrVariable || IsLessOrEqualPriority(less_priority, visual, right.visual, true))
+                result += " " + right.ToString(less_priority);
+
+            else
+                result += " (" + right.ToString(less_priority) + ")";
+
+            return result;
+
         }
 
         public override Expression Evaluate(Dictionary<char, double> variables)
@@ -309,7 +420,25 @@
 
         public override string ToString(List<string>[] less_priority)
         {
-            return "(" + left.ToString(less_priority) + ") " + visual + " (" + right.ToString(less_priority) + ")";
+
+            string result = "";
+
+            if (left is ConstantOrVariable || IsLessOrEqualPriority(less_priority, visual, left.visual, true))
+                result += left.ToString(less_priority);
+
+            else
+                result += "(" + left.ToString(less_priority) + ")";
+
+            result += " " + visual;
+
+            if (right is ConstantOrVariable || IsLessOrEqualPriority(less_priority, visual, right.visual, false))
+                result += " " + right.ToString(less_priority);
+
+            else
+                result += " (" + right.ToString(less_priority) + ")";
+
+            return result;
+
         }
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
@@ -318,22 +447,13 @@
             Expression right;
             Expression left;
 
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                right = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
+            right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
 
             //si la izquierda no existe entonces es un (-1 *)
             try
             {
 
-                if (expression[index - 1] == ')' && expression[0] == '(')
-                    left = CreateExpression(expression.Substring(1, index - 2), operators, less_priority);
-
-                else
-                    left = CreateExpression(expression.Substring(0, index), operators, less_priority);
-
+                left = CreateExpression(expression.Substring(0, index), operators, less_priority);
                 return new Minus(visual, left, right);
 
             }
@@ -384,7 +504,25 @@
 
         public override string ToString(List<string>[] less_priority)
         {
-            return "(" + left.ToString(less_priority) + ") " + visual + " (" + right.ToString(less_priority) + ")";
+
+            string result = "";
+
+            if (left is ConstantOrVariable || IsLessOrEqualPriority(less_priority, visual, left.visual, true))
+                result += left.ToString(less_priority);
+
+            else
+                result += "(" + left.ToString(less_priority) + ")";
+
+            result += " " + visual;
+
+            if (right is ConstantOrVariable || IsLessOrEqualPriority(less_priority, visual, right.visual, true))
+                result += " " + right.ToString(less_priority);
+
+            else
+                result += " (" + right.ToString(less_priority) + ")";
+
+            return result;
+
         }
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
@@ -393,17 +531,8 @@
             Expression right;
             Expression left;
 
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                right = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            if (expression[index - 1] == ')' && expression[0] == '(')
-                left = CreateExpression(expression.Substring(1, index - 2), operators, less_priority);
-
-            else
-                left = CreateExpression(expression.Substring(0, index), operators, less_priority);
+            right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
+            left = CreateExpression(expression.Substring(0, index), operators, less_priority);
 
             return new Multiply(visual, left, right);
 
@@ -442,7 +571,25 @@
 
         public override string ToString(List<string>[] less_priority)
         {
-            return "(" + left.ToString(less_priority) + ") " + visual + " (" + right.ToString(less_priority) + ")";
+
+            string result = "";
+
+            if (left is ConstantOrVariable || IsLessOrEqualPriority(less_priority, visual, left.visual, true))
+                result += left.ToString(less_priority);
+
+            else
+                result += "(" + left.ToString(less_priority) + ")";
+
+            result += " " + visual;
+
+            if (right is ConstantOrVariable)
+                result += " " + right.ToString(less_priority);
+
+            else
+                result += " (" + right.ToString(less_priority) + ")";
+
+            return result;
+
         }
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
@@ -451,17 +598,8 @@
             Expression right;
             Expression left;
 
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                right = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            if (expression[index - 1] == ')' && expression[0] == '(')
-                left = CreateExpression(expression.Substring(1, index - 2), operators, less_priority);
-
-            else
-                left = CreateExpression(expression.Substring(0, index), operators, less_priority);
+            right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
+            left = CreateExpression(expression.Substring(0, index), operators, less_priority);
 
             return new Divide(visual, left, right);
 
@@ -521,7 +659,25 @@
 
         public override string ToString(List<string>[] less_priority)
         {
-            return "(" + left.ToString(less_priority) + ") " + visual + " (" + right.ToString(less_priority) + ")";
+
+            string result = "";
+
+            if (left is ConstantOrVariable || left is UnaryExpression || left is Root || left is Log)
+                result += left.ToString(less_priority);
+
+            else
+                result += "(" + left.ToString(less_priority) + ")";
+
+            result += " " + visual;
+
+            if (right is ConstantOrVariable || right is UnaryExpression || right is Root || right is Log)
+                result += " " + right.ToString(less_priority);
+
+            else
+                result += " (" + right.ToString(less_priority) + ")";
+
+            return result;
+
         }
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
@@ -530,17 +686,8 @@
             Expression right;
             Expression left;
 
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                right = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            if (expression[index - 1] == ')' && expression[0] == '(')
-                left = CreateExpression(expression.Substring(1, index - 2), operators, less_priority);
-
-            else
-                left = CreateExpression(expression.Substring(0, index), operators, less_priority);
+            right = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
+            left = CreateExpression(expression.Substring(0, index), operators, less_priority);
 
             return new Exponent(visual, left, right);
 
@@ -571,11 +718,6 @@
 
             return new Ln(visual, newContent);
 
-        }
-
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
         }
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
@@ -827,7 +969,12 @@
 
         public override string ToString(List<string>[] less_priority)
         {
+
+            if (content is ConstantOrVariable)
+                return content.ToString(less_priority) + visual;
+
             return "(" + content.ToString(less_priority) + ")" + visual;
+
         }
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
@@ -835,11 +982,7 @@
 
             Expression content;
 
-            if (expression[index - 1] == ')' && expression[0] == '(')
-                content = CreateExpression(expression.Substring(1, index - 2), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(0, index), operators, less_priority);
+            content = CreateExpression(expression.Substring(0, index), operators, less_priority);
 
             return new Fac(visual, content);
 
@@ -873,25 +1016,6 @@
 
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Sen(visual, content);
-
-        }
     }
 
     public class Cos : UnaryExpression
@@ -915,25 +1039,6 @@
             return new Cos("cos", newContent);
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Cos(visual, content);
-
-        }
     }
 
     public class Tan : UnaryExpression
@@ -957,25 +1062,6 @@
             return new Tan("tan", newContent);
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Tan(visual, content);
-
-        }
     }
 
     public class Cot : UnaryExpression
@@ -999,25 +1085,6 @@
             return new Cot("cot", newContent);
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Cot(visual, content);
-
-        }
     }
 
     public class Sec : UnaryExpression
@@ -1041,25 +1108,6 @@
             return new Sec("sec", newContent);
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Sec(visual, content);
-
-        }
     }
 
     public class Csc : UnaryExpression
@@ -1083,25 +1131,6 @@
             return new Csc("csc", newContent);
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Csc(visual, content);
-
-        }
     }
 
     public class Arcsen : UnaryExpression
@@ -1123,11 +1152,6 @@
                 return new ConstantOrVariable(Math.Asin(double.Parse(newContent.visual)).ToString());
 
             return new Arcsen("arcsen", newContent);
-        }
-
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
         }
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
@@ -1165,23 +1189,6 @@
             return new Arccos("arccos", newContent);
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Arccos(visual, content);
-        }
     }
 
     public class Arctan : UnaryExpression
@@ -1205,25 +1212,6 @@
             return new Arctan("arctan", newContent);
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Arctan(visual, content);
-
-        }
     }
 
     public class Arccot : UnaryExpression
@@ -1242,23 +1230,6 @@
             throw new NotImplementedException();
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Arccot(visual, content);
-        }
     }
 
     public class Arcsec : UnaryExpression
@@ -1267,28 +1238,11 @@
         {
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
         public override Expression Derivate(char variable)
         {
             return new Divide("/", content.Derivate(variable), new Multiply("*", content, new Root("root", new ConstantOrVariable("2"), new Minus("-", new Exponent("^", content, new ConstantOrVariable("2")), new ConstantOrVariable("1")))));
         }
 
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Arcsec(visual, content);
-        }
 
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
@@ -1302,27 +1256,9 @@
         {
         }
 
-        public override string ToString(List<string>[] less_priority)
-        {
-            return visual + "(" + content.ToString(less_priority) + ")";
-        }
-
         public override Expression Derivate(char variable)
         {
             return new Multiply("*", new ConstantOrVariable("-1"), new Arcsec("arcsec", content).Derivate(variable));
-        }
-
-        protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
-        {
-            Expression content;
-
-            if (expression[index + visual.Length] == '(' && expression[expression.Length - 1] == ')')
-                content = CreateExpression(expression.Substring(index + visual.Length + 1, expression.Length - 1 - index - visual.Length - 1), operators, less_priority);
-
-            else
-                content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
-
-            return new Arccsc(visual, content);
         }
 
         public override Expression Evaluate(Dictionary<char, double> variables)
