@@ -1,0 +1,76 @@
+﻿@page "/"
+@using ExpressionCalculator
+
+<PageTitle>Index</PageTitle>
+
+<h1 style="text-align: center">Derivadas Parciales</h1>
+
+<div style="display: flex; justify-content:center;">
+    <div style="display:inline-flex;">
+        <input class="search"  @bind="ExpressionValue" @bind:event="oninput" placeholder="Introduzca su expresion" @onkeyup="DeterminateVariables">
+
+        @if(ExpressionValue!="")
+        {
+            <button type="default" class="btn-eliminate" @onclick="()=>{ExpressionValue=s;}">⨯</button>
+        }
+        else
+        {
+            <button type="default" class="btn-eliminate"></button>
+        }
+
+        <button type="default" class="btn-search"  @onclick="Derivate" >d(x)</button>
+    </div>
+</div>
+
+
+<div style="display: flex; justify-content: center;">
+    <div>
+        @foreach (var item in Variables)
+        {
+            <input type="radio" name="Variables" @oninput="() => { VariableToDerivate = item; }"/>
+            <label>Derivar respecto a (@item)</label> 
+            <br/>
+        }
+    </div>
+</div>
+
+<br/>
+
+@if(ExpressionDerivate!="")
+{
+    <div style="display: flex; justify-content: center;">
+        <h5>Derivada</h5>
+    </div>
+}
+
+<div style="display: flex; justify-content: center;">
+    <label>@ExpressionDerivate</label>
+</div>
+
+
+
+@code
+{
+    private string ExpressionDerivate { get; set; } = "";
+
+    private string s = "";
+
+    private string ExpressionValue { get; set; } = "";
+
+    private List<char> Variables { get; set; } = new List<char>();
+
+    private char VariableToDerivate { get; set; } = '0';
+
+    private void Derivate()
+    {
+        Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
+        Expression expression = func.Derivate(VariableToDerivate);
+        ExpressionDerivate = expression.ToString(Gui.less_priority);
+    }
+
+    private void DeterminateVariables()
+    {
+        Variables = Gui.DeterminateVariables(ExpressionValue);
+        ExpressionDerivate = "";
+    }
+}
