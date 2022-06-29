@@ -35,7 +35,8 @@ public class Gui
         new List<string>() { "+", "-" },
         new List<string>() { "*", "/" },
         new List<string>() { "^" },
-        new List<string>() { "ln", "log", "!", "root", "sen", "cos", "tan", "cot", "sec", "csc", "arcsen", "arccos", "arctan", "arccot", "arcsec", "arccsc" }
+        new List<string>() {"arcsen", "arccos", "arctan", "arccot", "arcsec", "arccsc" },
+        new List<string>() { "ln", "log", "!", "root", "sen", "cos", "tan", "cot", "sec", "csc" }
 
     };
 
