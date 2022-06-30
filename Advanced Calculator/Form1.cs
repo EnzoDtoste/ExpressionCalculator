@@ -60,9 +60,13 @@ namespace Advanced_Calculator
 
             //d.Add('x', 0);
 
-            Expression expression1 = expression.Evaluate(d);
+            Expression expression1 = expression.Derivate('x').Evaluate(new Dictionary<char, double>()).Derivate('x').Evaluate(new Dictionary<char, double>());
 
-            textBox2.Text = (expression1.ToString(less_priority));
+            textBox2.Text = expression1.ToString(less_priority);
+
+            Taylor t = new Taylor(expression);
+
+            textBox3.Text = t.Evaluate(9, new double[] { 1, 1}).visual.ToString();
 
         }
     }
