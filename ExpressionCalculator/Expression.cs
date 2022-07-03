@@ -215,6 +215,15 @@
 
         //cada operación debe saber como imprimirse
         public abstract string ToString(List<string>[] less_priority);
+        public override string ToString()
+        {
+            return visual;
+        }
+        public double ToDouble()
+        {
+            string exp = this.ToString();
+            return Double.Parse(exp);
+        }
 
         public abstract List<char> GetVariables(List<char> constants);
 
@@ -320,7 +329,7 @@
         {
             return visual;
         }
-
+        
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
             //si es una variable devuelvo su evaluación
@@ -330,6 +339,7 @@
             //es una constante por lo tanto la devuelvo así mismo
             return this;
         }
+        
     }
 
     public class Sum : BinaryExpression

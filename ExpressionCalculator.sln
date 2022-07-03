@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionCalculator", "Exp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Advanced Calculator", "Advanced Calculator\Advanced Calculator.csproj", "{8BC6F0C0-270B-4BD1-B670-A7C006052F1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{6C2F6940-A152-43AB-B6D1-BFD96A89EFD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculatorServer", "CalculatorServer\CalculatorServer.csproj", "{E03CA69B-2D10-4D01-BFDF-ED493FC98CD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{8BC6F0C0-270B-4BD1-B670-A7C006052F1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BC6F0C0-270B-4BD1-B670-A7C006052F1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BC6F0C0-270B-4BD1-B670-A7C006052F1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C2F6940-A152-43AB-B6D1-BFD96A89EFD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C2F6940-A152-43AB-B6D1-BFD96A89EFD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C2F6940-A152-43AB-B6D1-BFD96A89EFD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C2F6940-A152-43AB-B6D1-BFD96A89EFD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E03CA69B-2D10-4D01-BFDF-ED493FC98CD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E03CA69B-2D10-4D01-BFDF-ED493FC98CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E03CA69B-2D10-4D01-BFDF-ED493FC98CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E03CA69B-2D10-4D01-BFDF-ED493FC98CD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
