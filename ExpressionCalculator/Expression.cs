@@ -225,6 +225,8 @@
             return Double.Parse(exp);
         }
 
+        public abstract List<char> GetVariables(List<char> constants);
+
         //cada operación debe saber como evaluarse
         public abstract Expression Evaluate(Dictionary<char, double> variables);
 
@@ -243,6 +245,13 @@
             this.right = right;
         }
 
+        public override List<char> GetVariables(List<char> constants)
+        {
+
+            return new List<char>(left.GetVariables(constants).Union(right.GetVariables(constants)));
+
+        }
+
     }
 
     public abstract class UnaryExpression : Expression
@@ -253,6 +262,13 @@
         public UnaryExpression(string visual, Expression content) : base(visual)
         {
             this.content = content;
+        }
+
+        public override List<char> GetVariables(List<char> constants)
+        {
+
+            return content.GetVariables(constants);
+
         }
 
         public override string ToString(List<string>[] less_priority)
@@ -284,6 +300,16 @@
     {
         public ConstantOrVariable(string visual) : base(visual)
         {
+        }
+
+        public override List<char> GetVariables(List<char> constants)
+        {
+
+            if (IsVariable(this.visual) && !constants.Contains(this.visual[0]))
+                return new List<char>() { this.visual[0] };
+
+            return new List<char>();
+
         }
 
         public override Expression Derivate(char variable)
@@ -838,7 +864,7 @@
 
         public override Expression Derivate(char variable)
         {
-            return new Multiply("*", right, new Divide("/", new ConstantOrVariable("1"), left)).Derivate(variable);
+            return new Exponent("*", right, new Divide("/", new ConstantOrVariable("1"), left)).Derivate(variable);
         }
 
         public override Expression Evaluate(Dictionary<char, double> variables)
@@ -862,7 +888,7 @@
             if (newRight.visual == "1")
                 return new ConstantOrVariable("1");
 
-            return new Exponent("^", newLeft, newRight);
+            return new Root("root", newLeft, newRight);
 
         }
 
