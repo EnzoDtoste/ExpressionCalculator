@@ -76,6 +76,7 @@ namespace Advanced_Calculator
         {
             PaintGraph();
             PaintFunc();
+            
             PaintDer();
 
         }
@@ -113,6 +114,7 @@ namespace Advanced_Calculator
             }
             Graphics g = panel1.CreateGraphics();
             Pen blue = new Pen(Color.Blue, 2);
+            if(funcLine.Count > 0)
             g.DrawLines(blue, funcLine.ToArray());
         }
 
@@ -149,6 +151,7 @@ namespace Advanced_Calculator
             }
             Graphics g = panel1.CreateGraphics();
             Pen red = new Pen(Color.Red, 2);
+            if(funcLine.Count > 0)
             g.DrawLines(red, funcLine.ToArray());
             
         }
