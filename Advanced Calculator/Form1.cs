@@ -64,9 +64,9 @@ namespace Advanced_Calculator
 
             textBox2.Text = expression1.ToString(less_priority);
 
-            Taylor t = new Taylor(expression);
+            Taylor t = new Taylor(expression, new double[] {1, 1});
 
-            textBox3.Text = t.Evaluate(9, new double[] { 1, 1}).visual.ToString();
+            textBox3.Text = t.Evaluate(3, new double[] { 1, 1}).visual.ToString();
 
         }
     }

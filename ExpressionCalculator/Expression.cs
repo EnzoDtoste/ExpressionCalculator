@@ -854,7 +854,7 @@
 
         public override Expression Derivate(char variable)
         {
-            return new Multiply("*", right, new Divide("/", new ConstantOrVariable("1"), left)).Derivate(variable);
+            return new Exponent("*", right, new Divide("/", new ConstantOrVariable("1"), left)).Derivate(variable);
         }
 
         public override Expression Evaluate(Dictionary<char, double> variables)
@@ -878,7 +878,7 @@
             if (newRight.visual == "1")
                 return new ConstantOrVariable("1");
 
-            return new Exponent("^", newLeft, newRight);
+            return new Root("root", newLeft, newRight);
 
         }
 
