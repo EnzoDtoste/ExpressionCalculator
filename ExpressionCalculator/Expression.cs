@@ -206,7 +206,7 @@
 
             }
 
-            throw new ArgumentException("does operators does not exist");
+            throw new ArgumentException("the operators do not exist");
 
         }
 
