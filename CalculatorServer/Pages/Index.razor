@@ -11,7 +11,7 @@
 
         @if(ExpressionValue!="")
         {
-            <button type="default" class="btn-eliminate" @onclick="()=>{ExpressionValue=s; ExpressionDerivate=s;}">⨯</button>
+            <button type="default" class="btn-eliminate" @onclick="()=>{ExpressionValue=s; ExpressionDerivate=s;ExpressionTaylor=s;}">⨯</button>
         }
         else
         {
@@ -19,9 +19,17 @@
         }
 
         <button type="default" class="btn-search"  @onclick="Derivate" >d(x)</button>
+        
     </div>
+    
 </div>
 
+
+
+ 
+<button type ="button"   class="btn-primary" @onclick="Taylor" >Taylor en (@aprox)</button>
+<button type ="button"   class="btn-primary" @onclick="()=> {aprox ++;}" >/\</button>
+<button type ="button"   class="btn-primary" @onclick="()=> {aprox --;}" >\/</button>
 
 <div style="display: flex; justify-content: center;">
     <div>
@@ -47,14 +55,25 @@
     <label>@ExpressionDerivate</label>
 </div>
 
+@if(ExpressionTaylor!="")
+{
+    <div style="display: flex; justify-content: center;">
+        <h5>Taylor</h5>
+    </div>
+}
+
+<div style="display: flex; justify-content: center;">
+    <label>@ExpressionTaylor</label>
+</div>
 
 
 @code
 {
     private string ExpressionDerivate { get; set; } = "";
+    private string ExpressionTaylor { get; set; } = ""; 
 
     private string s = "";
-
+    private double aprox = 0; 
     private string ExpressionValue { get; set; } = "";
 
     private List<char> Variables { get; set; } = new List<char>();
@@ -72,5 +91,22 @@
     {
         Variables = Gui.DeterminateVariables(ExpressionValue);
         ExpressionDerivate = "";
+        ExpressionTaylor = "";
     }
+    private void Taylor()
+    {
+        Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
+        ExpressionTaylor = "";
+
+        Taylor result = new Taylor(func);
+        double[] n = { aprox};
+
+        IEnumerable<Expression> sum = result.N_Terms(5,n);
+        foreach(var exp in sum)
+        {
+
+            ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
+        }
+    }
+
 }

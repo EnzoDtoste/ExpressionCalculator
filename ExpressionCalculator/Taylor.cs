@@ -14,7 +14,7 @@ namespace ExpressionCalculator
         double[] center;
 
         //derivadas del nivel actual
-        List<Expression> vectorDer;
+        public List<Expression> vectorDer;
 
         //indice de derivación
         List<int[]> exps;
@@ -76,7 +76,7 @@ namespace ExpressionCalculator
         }
 
         //Próximo valor de la serie
-        private Expression NextValue(double[] value)
+        public Expression NextValue(double[] value)
         {
 
             //inicializo suma
@@ -155,9 +155,11 @@ namespace ExpressionCalculator
             {
                 sum = new Sum("+", sum, NextValue(value));
             }
-
-            return sum.Evaluate(new Dictionary<char, double>());
-
+            
+              return sum.Evaluate(new Dictionary<char, double>());
+            
+            
+            
         }
 
         /// <summary>
