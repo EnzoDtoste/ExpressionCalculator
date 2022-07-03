@@ -581,6 +581,9 @@
             if (newLeft.visual == "0")
                 return new ConstantOrVariable("0");
 
+            if (newRight.visual == "1")
+                return newLeft;
+
             return new Divide("/", newLeft, newRight);
 
         }
