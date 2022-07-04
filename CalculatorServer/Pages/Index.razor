@@ -145,6 +145,7 @@
         ExpressionIntegral = answer.ToString();
     }
 
+
     private void DeterminateVariables()
     {
         int first = Variables.Count;
@@ -162,19 +163,21 @@
     private void Taylor()
     {
         _selectVector = false;
-        
         Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
-        ExpressionTaylor = "";
 
         Taylor result = new Taylor(func);
+
         double[] n = aprox;
 
-        IEnumerable<Expression> sum = result.N_Terms(5, n);
+        IEnumerable<Expression> sum = result.N_Terms(5,n);
+
+        ExpressionTaylor = sum.First().ToString(Gui.less_priority);
+        sum = sum.Skip(1);
+        
         foreach (var exp in sum)
         {
             ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
         }
-        ExpressionTaylor = ExpressionTaylor.Substring(3, ExpressionTaylor.Length - 3);
     }
 
     private string Print(List<double> x)
