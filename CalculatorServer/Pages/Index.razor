@@ -27,9 +27,15 @@
 
 
  
-<button type ="button"   class="btn-primary" @onclick="Taylor" >Taylor en (@aprox)</button>
-<button type ="button"   class="btn-primary" @onclick="()=> {aprox ++;}" >/\</button>
-<button type ="button"   class="btn-primary" @onclick="()=> {aprox --;}" >\/</button>
+<button type ="button"   class="btn-primary" @onclick="Taylor" >Aproximacion en (@Print(aprox)) de la funcion por Taylor</button>
+@for(int i = 0; i<Variables.Count; i++)
+{
+  
+    <button type ="button"   class="btn-primary" @onclick="()=> {aprox[i] ++;}" >/\</button>
+<button type ="button"   class="btn-primary" @onclick="()=> {aprox[i] --;}" >\/</button>
+
+}
+
 
 <div style="display: flex; justify-content: center;">
     <div>
@@ -73,7 +79,7 @@
     private string ExpressionTaylor { get; set; } = ""; 
 
     private string s = "";
-    private double aprox = 0; 
+    private List<double> aprox = new List<double>(); 
     private string ExpressionValue { get; set; } = "";
 
     private List<char> Variables { get; set; } = new List<char>();
@@ -92,6 +98,11 @@
         Variables = Gui.DeterminateVariables(ExpressionValue);
         ExpressionDerivate = "";
         ExpressionTaylor = "";
+        aprox = new List<double>();
+        foreach(var x in Variables)
+        {
+            aprox.Add(0);
+        }
     }
     private void Taylor()
     {
@@ -99,7 +110,7 @@
         ExpressionTaylor = "";
 
         Taylor result = new Taylor(func);
-        double[] n = { aprox};
+        double[] n = aprox.ToArray();
 
         IEnumerable<Expression> sum = result.N_Terms(5,n);
         foreach(var exp in sum)
@@ -107,6 +118,15 @@
 
             ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
         }
+    }
+    private string Print(List<double> x)
+    {
+        string result = "";
+        foreach(var num in x)
+        {
+            result += num + ",";
+        }
+        return result;
     }
 
 }
