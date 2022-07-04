@@ -1,8 +1,8 @@
- #Proyecto de Analisis matematico!
+ #Proyecto de Análisis matemático!
 
 ## Temas
 
-1. Tema4: **Derivadación** (Principal).
+1. Tema4: **Derivación** (Principal).
 Desarrollo de un programa que dada una función de varias variables permita derivar con respecto a cualquiera de sus variables.
 2. Tema3: **Integración** (Adicional).
 Desarrollo de un programa que dada una función permita calcular aprocimadamente su integral en un intervalo dado.
