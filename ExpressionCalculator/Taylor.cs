@@ -8,7 +8,6 @@ namespace ExpressionCalculator
 {
     public class Taylor
     {
-
         //valores del centro
         Dictionary<char, double> values;
         double[] center;
@@ -29,10 +28,9 @@ namespace ExpressionCalculator
 
         public Taylor(Expression function)
         {
-
             values = new Dictionary<char, double>();
 
-            vars = function.GetVariables(new List<char>() { 'e' });
+            vars = function.GetVariables(new List<char>() {'e'});
 
             //centro 0
             foreach (char var in vars)
@@ -43,25 +41,23 @@ namespace ExpressionCalculator
             center = new double[vars.Count];
 
             //primer elemento es la función sin derivar
-            vectorDer = new List<Expression>() { function };
+            vectorDer = new List<Expression>() {function};
             //indices de derivación en 0
-            exps = new List<int[]>() { new int[vars.Count] };
-
+            exps = new List<int[]>() {new int[vars.Count]};
         }
 
         //centro específico
         public Taylor(Expression function, double[] center)
         {
-
-            if (center.Length != function.GetVariables(new List<char>() { 'e' }).Count)
+            if (center.Length != function.GetVariables(new List<char>() {'e'}).Count)
                 throw new ArgumentException("Invalid Vector X0");
 
             values = new Dictionary<char, double>();
 
-            vars = function.GetVariables(new List<char>() { 'e' });
+            vars = function.GetVariables(new List<char>() {'e'});
 
             //centro especificado
-            for(int i = 0; i < vars.Count; i++)
+            for (int i = 0; i < vars.Count; i++)
             {
                 values.Add(vars[i], center[i]);
             }
@@ -69,47 +65,42 @@ namespace ExpressionCalculator
             this.center = center;
 
             //primer elemento es la función sin derivar
-            vectorDer = new List<Expression>() { function };
+            vectorDer = new List<Expression>() {function};
             //indices de derivación en 0
-            exps = new List<int[]>() { new int[vars.Count] };
-
+            exps = new List<int[]>() {new int[vars.Count]};
         }
 
         //Próximo valor de la serie
         public Expression NextValue(double[] value)
         {
-
             //inicializo suma
             Expression sum = new ConstantOrVariable("0");
 
             //por cada función
-            for(int i = 0; i < vectorDer.Count; i++)
+            for (int i = 0; i < vectorDer.Count; i++)
             {
-
                 //evalúo en el centro
                 var mult = vectorDer[i].Evaluate(values);
 
                 //multiplico las diferencias elevadas al indice de derivación correspondiente, de las variables con el centro 
-                for(int j = 0; j < center.Length; j++)
+                for (int j = 0; j < center.Length; j++)
                 {
-                    mult = new Multiply("*", mult, new ConstantOrVariable(Math.Pow(value[j] - center[j], exps[i][j]).ToString()));
+                    mult = new Multiply("*", mult,
+                        new ConstantOrVariable(Math.Pow(value[j] - center[j], exps[i][j]).ToString()));
                 }
 
                 //voy sumando
                 sum = new Sum("+", sum, mult.Evaluate(values));
-
             }
 
             List<Expression> ders = new List<Expression>();
             List<int[]> nextExps = new List<int[]>();
 
-            for(int i = 0; i < vectorDer.Count; i++)
+            for (int i = 0; i < vectorDer.Count; i++)
             {
-                
                 //derivo cada función por cada variable
-                for(int j = 0; j < vars.Count; j++)
+                for (int j = 0; j < vars.Count; j++)
                 {
-
                     ders.Add(vectorDer[i].Derivate(vars[j]).Evaluate(new Dictionary<char, double>()));
 
                     int[] c = new int[vars.Count];
@@ -119,9 +110,7 @@ namespace ExpressionCalculator
                     c[j]++;
 
                     nextExps.Add(c);
-
                 }
-
             }
 
             //reemplazo
@@ -135,7 +124,6 @@ namespace ExpressionCalculator
 
             //divido la sumatoria entre el factorial de k
             return new Divide("/", sum, fac.Evaluate(dic)).Evaluate(new Dictionary<char, double>());
-
         }
 
         /// <summary>
@@ -146,20 +134,16 @@ namespace ExpressionCalculator
         /// <returns></returns>
         public Expression Evaluate(int n, double[] value)
         {
-
             //inicializo suma
             Expression sum = new ConstantOrVariable("0");
 
             //sumatoria de los términos
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 sum = new Sum("+", sum, NextValue(value));
             }
-            
-              return sum.Evaluate(new Dictionary<char, double>());
-            
-            
-            
+
+            return sum.Evaluate(new Dictionary<char, double>());
         }
 
         /// <summary>
@@ -170,13 +154,10 @@ namespace ExpressionCalculator
         /// <returns></returns>
         public IEnumerable<Expression> N_Terms(int n, double[] value)
         {
-
-            for(int i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 yield return NextValue(value);
             }
-
         }
-
     }
 }

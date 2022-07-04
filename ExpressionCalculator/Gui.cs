@@ -4,7 +4,6 @@ public class Gui
 {
     public static List<Expression> operators = new List<Expression>()
     {
-
         new Sum("+", null, null),
         new Minus("-", null, null),
         new Multiply("*", null, null),
@@ -26,24 +25,21 @@ public class Gui
         new Arccot("arccot", null),
         new Arcsec("arcsec", null),
         new Arccsc("arccsc", null)
-
     };
 
     public static List<string>[] less_priority = new List<string>[]
     {
-
-        new List<string>() { "+", "-" },
-        new List<string>() { "*", "/" },
-        new List<string>() { "^" },
-        new List<string>() {"arcsen", "arccos", "arctan", "arccot", "arcsec", "arccsc" },
-        new List<string>() { "ln", "log", "!", "root", "sen", "cos", "tan", "cot", "sec", "csc" }
-
+        new List<string>() {"+", "-"},
+        new List<string>() {"*", "/"},
+        new List<string>() {"^"},
+        new List<string>() {"arcsen", "arccos", "arctan", "arccot", "arcsec", "arccsc"},
+        new List<string>() {"ln", "log", "!", "root", "sen", "cos", "tan", "cot", "sec", "csc"}
     };
 
     public static List<string> Languaje = new List<string>()
     {
         "ln", "log", "!", "root", "sen", "cos", "tan", "cot", "sec", "csc", "arcsen", "arccos", "arctan", "arccot",
-        "arcsec", "arccsc", "e","pi"
+        "arcsec", "arccsc", "e", "pi"
     };
 
     public static List<char> DeterminateVariables(string s)
@@ -62,7 +58,7 @@ public class Gui
                     if (Languaje.Contains(aux))
                     {
                         isVariable = false;
-                        i += j;
+                        i += j - 1;
                         break;
                     }
                 }
@@ -72,7 +68,6 @@ public class Gui
                     variables.Add(s[i]);
                     visited[s[i]] = true;
                 }
-                
             }
         }
 

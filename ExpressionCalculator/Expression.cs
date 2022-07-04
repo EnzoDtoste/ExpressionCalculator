@@ -239,7 +239,7 @@
 
         protected Expression left;
         protected Expression right;
-        public BinaryExpression(string visual, Expression left, Expression right) : base(visual)
+        public BinaryExpression(string visual, Expression? left, Expression? right) : base(visual)
         {
             this.left = left;
             this.right = right;
@@ -344,7 +344,7 @@
 
     public class Sum : BinaryExpression
     {
-        public Sum(string visual, Expression left, Expression right) : base(visual, left, right)
+        public Sum(string visual, Expression? left, Expression? right) : base(visual, left, right)
         {
         }
 

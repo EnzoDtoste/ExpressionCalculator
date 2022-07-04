@@ -7,51 +7,52 @@
 
 <div style="display: flex; justify-content:center;">
     <div style="display:inline-flex;">
-        <input class="search"  @bind="ExpressionValue" @bind:event="oninput" placeholder="Introduzca su expresion" @onkeyup="DeterminateVariables">
+        <input class="search" @bind="ExpressionValue" @bind:event="oninput" placeholder="Introduzca su expresion" @onkeyup="DeterminateVariables">
 
-        @if(ExpressionValue!="")
+        @if (ExpressionValue != "")
         {
-            <button type="default" class="btn-eliminate" @onclick="()=>{ExpressionValue=s; ExpressionDerivate=s;ExpressionTaylor=s;ExpressionIntegral=s;}">⨯</button>
+            <button class="btn-eliminate" @onclick="() =>{ExpressionValue = s; ExpressionDerivate = s;ExpressionTaylor = s;ExpressionIntegral = s;}">⨯</button>
         }
         else
         {
-            <button type="default" class="btn-eliminate"></button>
+            <button class="btn-eliminate"></button>
         }
 
-        <button type="default" class="btn-search"  @onclick="Derivate" >d(x)</button>
-        
+        <button class="btn-search" @onclick="() => { _expression=true;}">d(x)</button>
+
     </div>
-    
+
 </div>
 
-
-
- 
-<button type ="button"   class="btn-primary" @onclick="Taylor" >Aproximacion en (@Print(aprox)) de la funcion por Taylor</button>
-
- <div>
-     <button type ="button"   class="btn-primary" @onclick="()=> {aprox[aprox.Count -1] ++;}" >/\</button>
-     <button type ="button"   class="btn-primary" @onclick="()=> {aprox[aprox.Count -1] --;}" >\/</button>
- </div>    
-
- <button type ="button"   class="btn-primary" @onclick="Integrate" >Integrar de 0 a 1</button>
-
-
-
-<div style="display: flex; justify-content: center;">
-    <div>
-        @foreach (var item in Variables)
-        {
-            <input type="radio" name="Variables" @oninput="() => { VariableToDerivate = item; }"/>
-            <label>Derivar respecto a (@item)</label> 
-            <br/>
-        }
+@if (_expression)
+{
+    <div style="display: flex; justify-content: center">
+        <div style="display: flex; justify-content: center;">
+            <button class="Derivate1" @onclick="Derivate" >Derivar respecto a :</button>
+            <EditForm Model="Variables">
+                <InputSelect @bind-Value="VariableToDerivate" class="InputSelect">
+                    @foreach (var item in Variables)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </InputSelect>
+            </EditForm>
+        </div>
+        <div style="width: 30px;"></div>
+        <div style="display: flex; justify-content: center;">
+            <button class="Derivate1" @onclick="Taylor" >Aprox por Taylor :</button>
+            <input type="number" class="InputSelect" @bind="_aprox"/>
+        </div>
+        <div style="width: 30px;"></div>
+        <div style="display: flex; justify-content: center;">
+            <button class="Derivate2" @onclick="Integrate">Integrar de 0 a 1</button>
+        </div>
     </div>
-</div>
+}
 
 <br/>
 
-@if(ExpressionDerivate!="")
+@if (ExpressionDerivate != "")
 {
     <div style="display: flex; justify-content: center;">
         <h5>Derivada</h5>
@@ -60,9 +61,10 @@
 
 <div style="display: flex; justify-content: center;">
     <label>@ExpressionDerivate</label>
+    <br/>
 </div>
 
-@if(ExpressionTaylor!="")
+@if (ExpressionTaylor != "")
 {
     <div style="display: flex; justify-content: center;">
         <h5>Taylor</h5>
@@ -71,9 +73,10 @@
 
 <div style="display: flex; justify-content: center;">
     <label>@ExpressionTaylor</label>
+    <br/>
 </div>
 
-@if(ExpressionIntegral!="")
+@if (ExpressionIntegral != "")
 {
     <div style="display: flex; justify-content: center;">
         <h5>Integral</h5>
@@ -82,16 +85,20 @@
 
 <div style="display: flex; justify-content: center;">
     <label>@ExpressionIntegral</label>
+    <br/>
 </div>
 
 @code
 {
     private string ExpressionDerivate { get; set; } = "";
-    private string ExpressionTaylor { get; set; } = ""; 
-    private string ExpressionIntegral { get; set; } = ""; 
+    private string ExpressionTaylor { get; set; } = "";
+    private string ExpressionIntegral { get; set; } = "";
+
+    private bool _expression = false;
 
     private string s = "";
-    private List<double> aprox = new List<double>(); 
+    private List<double> aprox = new List<double>();
+    private int _aprox = 0;
     private string ExpressionValue { get; set; } = "";
 
     private List<char> Variables { get; set; } = new List<char>();
@@ -104,6 +111,7 @@
         Expression expression = func.Derivate(VariableToDerivate).Evaluate(new Dictionary<char, double>());
         ExpressionDerivate = expression.ToString(Gui.less_priority);
     }
+
     private void Integrate()
     {
         ExpressionIntegral = "";
@@ -111,8 +119,8 @@
         double answer = IntegralDefinida.Integra(func, 0, 1);
         Console.WriteLine(answer);
         ExpressionIntegral = answer.ToString();
-
     }
+
     private void DeterminateVariables()
     {
         int first = Variables.Count;
@@ -123,27 +131,33 @@
         ExpressionIntegral = "";
 
         if (after > first) aprox.Add(0);
-        else if(first > after) aprox.RemoveAt(aprox.Count - 1);
-
+        else if (first > after) aprox.RemoveAt(aprox.Count - 1);
     }
+
     private void Taylor()
     {
         Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
         ExpressionTaylor = "";
 
         Taylor result = new Taylor(func);
-        double[] n = aprox.ToArray();
-
-        IEnumerable<Expression> sum = result.N_Terms(5,n);
-        foreach(var exp in sum)
+        //double[] n = aprox.ToArray();
+        double[] n = new double[_aprox];
+        for (int i = 0; i < _aprox; i++)
         {
+            n[i] = i;
+        }
 
+        IEnumerable<Expression> sum = result.N_Terms(5, n);
+        foreach (var exp in sum)
+        {
             ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
         }
+        ExpressionTaylor = ExpressionTaylor.Substring(3, ExpressionTaylor.Length - 3);
     }
+
     private string Print(List<double> x)
     {
-         return String.Join(",", x);
+        return String.Join(",", x);
     }
 
 }
