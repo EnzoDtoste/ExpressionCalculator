@@ -14,14 +14,14 @@
 
         @if (ExpressionValue != "")
         {
-            <button class="btn-eliminate" @onclick="() =>{ExpressionValue = s; ExpressionDerivate = s;ExpressionTaylor = s;ExpressionIntegral = s;}">⨯</button>
+            <button class="btn-eliminate" @onclick="() =>{ExpressionValue = s; ExpressionDerivate = s;ExpressionTaylor = s;ExpressionIntegral = s; _expression=false;}">⨯</button>
         }
         else
         {
             <button class="btn-eliminate"></button>
         }
 
-        <button class="btn-search" @onclick="() => { _expression=true;}">d(x)</button>
+        <button class="btn-search" @onclick="() => { _expression=true;}">df</button>
 
     </div>
 
@@ -48,13 +48,16 @@
             <button class="Derivate1R" @onclick="()=>{_selectVector = true;}">Seleccionar Vector</button>
             
         </div>
-        <div style="width: 30px;"></div>
+        @if(Variables.Count == 1)
+        {
+            <div style="width: 30px;"></div>
         <div style="display: flex; justify-content: center;">
             <button class="Derivate2" @onclick="Integrate">Integrar de</button>
             <input class="A" type=number @bind="a"/>
             <div class="A"> a </div>
             <input  class="B" type=number @bind="b"/>
         </div>
+        }
     </div>
 }
 
@@ -186,8 +189,8 @@
         try
         {
             Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
-        Expression expression = func.Derivate(VariableToDerivate).Evaluate(new Dictionary<char, double>());
-        ExpressionDerivate = expression.ToString(Gui.less_priority);
+            Expression expression = func.Derivate(VariableToDerivate).Evaluate(new Dictionary<char, double>());
+            ExpressionDerivate = expression.ToString(Gui.less_priority);
 
         }
         catch
@@ -201,25 +204,28 @@
         try
         {
             ExpressionIntegral = "";
-        Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
-        double answer = IntegralDefinida.Integra(func, a, b,Variables);
-        Console.WriteLine(answer);
-        ExpressionIntegral = answer.ToString();
+            Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
+            double answer = IntegralDefinida.Integra(func, a, b,Variables);
+            Console.WriteLine(answer);
+            ExpressionIntegral = answer.ToString();
         }
         catch
         {
-            ExpressionDerivate="Su expresion es incorrecta";
+            ExpressionIntegral="Su expresion es incorrecta";
         }
     }
 
 
-    private void DeterminateVariables()
+    private void DeterminateVariables(KeyboardEventArgs e)
     {
-        int first = Variables.Count;
+        if(e.Code=="Enter")
+        {
+             _expression=true;
+        }
         Variables = Gui.DeterminateVariables(ExpressionValue);
         aprox = new double[Variables.Count];
         radio =new double[Variables.Count];
-        int after = Variables.Count;
+        
         ExpressionDerivate = "";
         ExpressionTaylor = "";
         ExpressionTaylorN = "";
@@ -233,35 +239,37 @@
         try
         {
             _selectVector = false;
-        Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
+            Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
 
-        Taylor result = new Taylor(func,radio);
+            Taylor result = new Taylor(func,radio);
 
-        double[] n = aprox;
+            double[] n = aprox;
 
-        string total = result.Evaluate(cant, n).ToString(Gui.less_priority);
-        IEnumerable<Expression> nsn = result.N_Terms(cant);
-        IEnumerable<Expression> sum = result.N_Terms(cant,n);
+            string total = result.Evaluate(cant, n).ToString(Gui.less_priority);
+            IEnumerable<Expression> nsn = result.N_Terms(cant);
+            IEnumerable<Expression> sum = result.N_Terms(cant,n);
 
-        ExpressionTaylorN = nsn.First().ToString(Gui.less_priority);
+            ExpressionTaylorN = nsn.First().ToString(Gui.less_priority);
 
-        foreach (var exp in nsn.Skip(1))
-        {
-            ExpressionTaylorN += " + " + exp.ToString(Gui.less_priority);
-        }
+            foreach (var exp in nsn.Skip(1))
+            {
+                ExpressionTaylorN += " + " + exp.ToString(Gui.less_priority);
+            }
 
-        ExpressionTaylor = sum.First().ToString(Gui.less_priority);
+            ExpressionTaylor = sum.First().ToString(Gui.less_priority);
 
-        foreach (var exp in sum.Skip(1))
-        {
-            ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
-        }
+            foreach (var exp in sum.Skip(1))
+            {
+                ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
+            }
 
-        ExpressionTaylorTotal = total;
+            ExpressionTaylorTotal = total;
         }
         catch
         {
-            ExpressionDerivate="Su expresion es incorrecta";
+            ExpressionTaylor="Su expresion es incorrecta";
+            ExpressionTaylorN = "";
+            ExpressionTaylorTotal = "";
         }
 
     }

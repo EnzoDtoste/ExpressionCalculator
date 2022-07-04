@@ -132,7 +132,7 @@ a, .btn-link {
         border-bottom: groove 2px;
         border-left: 0;
         border-right: 0;
-        width: 30px;
+        width: 45px;
         height: 30px;
     }
 
@@ -157,7 +157,7 @@ a, .btn-link {
         border-right: 0;
     }
     .A{
-        width: 30px; height: 30px; 
+        width: 45px; height: 30px; 
         background-color: #fff;
 
         border-top: groove 2px;
@@ -167,7 +167,7 @@ a, .btn-link {
     }
 
     .B{
-        width: 30px; height: 30px; 
+        width: 45px; height: 30px; 
         background-color: #fff;
 
         border-top: groove 2px;
