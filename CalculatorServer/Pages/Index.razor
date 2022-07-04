@@ -91,7 +91,17 @@
 }
 
 <div style="display: flex; justify-content: center;">
+    <label>@ExpressionTaylorN</label>
+    <br/>
+</div>
+
+<div style="display: flex; justify-content: center;">
     <label>@ExpressionTaylor</label>
+    <br/>
+</div>
+
+<div style="display: flex; justify-content: center;">
+    <label>@ExpressionTaylorTotal</label>
     <br/>
 </div>
 
@@ -110,9 +120,11 @@
 @code
 {
     private string ExpressionDerivate { get; set; } = "";
-    
+
+    private string ExpressionTaylorN { get; set; } = "";
     private string ExpressionTaylor { get; set; } = "";
-    
+    private string ExpressionTaylorTotal { get; set; } = "";
+
     private string ExpressionIntegral { get; set; } = "";
 
     private bool _expression = false;
@@ -120,9 +132,9 @@
     private bool _selectVector;
 
     private string s = "";
-    
+
     private double[] aprox = Array.Empty<double>();
-    
+
     private string ExpressionValue { get; set; } = "";
 
     private List<(char,int)> Variables { get; set; } = new List<(char,int)>();
@@ -154,6 +166,8 @@
         int after = Variables.Count;
         ExpressionDerivate = "";
         ExpressionTaylor = "";
+        ExpressionTaylorN = "";
+        ExpressionTaylorTotal = "";
         ExpressionIntegral = "";
 
         // if (after > first) aprox.Add(0);
@@ -169,15 +183,26 @@
 
         double[] n = aprox;
 
+        string total = result.Evaluate(5, n).ToString(Gui.less_priority);
+        IEnumerable<Expression> nsn = result.N_Terms(5);
         IEnumerable<Expression> sum = result.N_Terms(5,n);
 
+        ExpressionTaylorN = nsn.First().ToString(Gui.less_priority);
+
+        foreach (var exp in nsn.Skip(1))
+        {
+            ExpressionTaylorN += " + " + exp.ToString(Gui.less_priority);
+        }
+
         ExpressionTaylor = sum.First().ToString(Gui.less_priority);
-        sum = sum.Skip(1);
-        
-        foreach (var exp in sum)
+
+        foreach (var exp in sum.Skip(1))
         {
             ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
         }
+
+        ExpressionTaylorTotal = total;
+
     }
 
     private string Print(List<double> x)

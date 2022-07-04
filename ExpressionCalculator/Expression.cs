@@ -509,17 +509,17 @@
             Expression newLeft = left.Evaluate(variables);
             Expression newRight = right.Evaluate(variables);
 
-            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
-                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) * double.Parse(newRight.visual.ToString())).ToString());
-
             if (newLeft.visual == "0")
                 return new ConstantOrVariable("0");
 
-            if (newLeft.visual == "1")
-                return newRight;
-
             if (newRight.visual == "0")
                 return new ConstantOrVariable("0");
+
+            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
+                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) * double.Parse(newRight.visual.ToString())).ToString());
+
+            if (newLeft.visual == "1")
+                return newRight;
 
             if (newRight.visual == "1")
                 return newLeft;
