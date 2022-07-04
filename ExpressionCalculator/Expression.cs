@@ -215,16 +215,7 @@
 
         //cada operación debe saber como imprimirse
         public abstract string ToString(List<string>[] less_priority);
-        public override string ToString()
-        {
-            return visual;
-        }
-        public double ToDouble()
-        {
-            string exp = this.ToString();
-            return Double.Parse(exp);
-        }
-
+       
         public abstract List<char> GetVariables(List<char> constants);
 
         //cada operación debe saber como evaluarse
