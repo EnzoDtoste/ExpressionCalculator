@@ -3,7 +3,6 @@
 
     public abstract class Expression
     {
-        
         //indicador de operación, constante o variable
         public string visual;
         protected Expression(string visual)
@@ -62,16 +61,16 @@
         private static string RemoveExternalP(string expression)
         {
 
-            if(expression[0] == '(' && expression[expression.Length - 1] == ')')
+            if (expression[0] == '(' && expression[expression.Length - 1] == ')')
             {
 
                 string temp = expression.Substring(1, expression.Length - 2);
 
                 int count = 0;
 
-                foreach(char c in temp)
+                foreach (char c in temp)
                 {
-                  
+
                     if (c == '(')
                         count++;
                     if (c == ')')
@@ -96,9 +95,9 @@
         //indice de una operación en la colección
         private static int indexInColl(List<Expression> operators, string visual)
         {
-            for(int i = 0; i < operators.Count; i++)
+            for (int i = 0; i < operators.Count; i++)
             {
-                if(operators[i].visual == visual)
+                if (operators[i].visual == visual)
                     return i;
             }
             return -1;
@@ -130,9 +129,9 @@
 
             int count = 0;
 
-            for(int i = 0; i < index; i++)
+            for (int i = 0; i < index; i++)
             {
-                if(expression[i] == '(')
+                if (expression[i] == '(')
                     count++;
                 if (expression[i] == ')')
                     count--;
@@ -175,19 +174,19 @@
         public bool IsLessOrEqualPriority(List<string>[] less_priority, string a, string b, bool equal)
         {
 
-            foreach(var item in less_priority)
+            foreach (var item in less_priority)
             {
 
                 bool found_a = false;
                 bool found_b = false;
 
-                foreach(var e in item)
+                foreach (var e in item)
                 {
 
                     if (e == a)
                         found_a = true;
 
-                    if(e == b)
+                    if (e == b)
                         found_b = true;
 
                 }
@@ -281,7 +280,7 @@
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
         {
-            
+
             Expression content;
 
             content = CreateExpression(expression.Substring(index + visual.Length), operators, less_priority);
@@ -329,17 +328,17 @@
         {
             return visual;
         }
-        
+
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
             //si es una variable devuelvo su evaluación
-            if(variables.ContainsKey(visual[0]))
+            if (variables.ContainsKey(visual[0]))
                 return new ConstantOrVariable(variables[visual[0]].ToString());
 
             //es una constante por lo tanto la devuelvo así mismo
             return this;
         }
-        
+
     }
 
     public class Sum : BinaryExpression
@@ -350,7 +349,7 @@
 
         protected override Expression ExtractExpression(string expression, int index, List<Expression> operators, List<string>[] less_priority)
         {
-            
+
             Expression right;
             Expression left;
 
@@ -386,7 +385,7 @@
 
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
-            
+
             Expression newLeft = left.Evaluate(variables);
             Expression newRight = right.Evaluate(variables);
 
@@ -427,7 +426,7 @@
 
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
-          
+
             Expression newLeft = left.Evaluate(variables);
             Expression newRight = right.Evaluate(variables);
 
@@ -441,7 +440,7 @@
                 return newLeft;
 
             return new Minus("-", newLeft, newRight);
-        
+
         }
 
         public override string ToString(List<string>[] less_priority)
@@ -647,7 +646,7 @@
 
         public override Expression Derivate(char variable)
         {
-            
+
             //si el exponente es una constante deriva como x^a
             if (right is ConstantOrVariable && !IsVariable(right.visual, variable.ToString()))
                 return new Multiply("*", new Multiply("*", right, new Exponent("^", left, new Minus("-", right, new ConstantOrVariable("1")))), left.Derivate(variable));

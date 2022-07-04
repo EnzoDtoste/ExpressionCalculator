@@ -43,13 +43,17 @@
         </div>
         <div style="width: 30px;"></div>
         <div style="display: flex; justify-content: center;">
-            <button class="Derivate1" @onclick="Taylor" >Aprox por Taylor</button>
+            <button class="Derivate1" @onclick="Taylor" >Aprox por Taylor n =</button>
+            <input type="number" @bind ="cant" class="Cant"/>
             <button class="Derivate1R" @onclick="()=>{_selectVector = true;}">Seleccionar Vector</button>
             
         </div>
         <div style="width: 30px;"></div>
         <div style="display: flex; justify-content: center;">
-            <button class="Derivate2" @onclick="Integrate">Integrar de 0 a 1</button>
+            <button class="Derivate2" @onclick="Integrate">Integrar de</button>
+            <input class="A" type=number @bind="a"/>
+            <div class="A"> a </div>
+            <input  class="B" type=number @bind="b"/>
         </div>
     </div>
 }
@@ -59,13 +63,41 @@
 @if (_selectVector)
 {
     <div style="display: flex; justify-content: center">
+        <div>
+            <label>Seleccione el vector centro</label>
+        </div>
+    </div>
+
+    <br/>
+
+    <div style="display: flex; justify-content: center">
+        @foreach(var item in Variables)
+        {
+            <label style="width: 30px; height: 30px;">@item.Item1</label>
+            <input type="number" @bind="radio[item.Item2]" style="width: 50px; height: 30px;"/>
+            <div style="width: 20px;"></div>
+        }
+    </div>
+
+    <br/>
+    <br/>
+
+    <div style="display: flex; justify-content: center">
+        <div>
+            <label>Seleccione el vector a evaluar</label>
+        </div>
+    </div>
+
+    <br/>
+
+    <div style="display: flex; justify-content: center">
         @foreach(var item in Variables)
         {
             <label style="width: 30px; height: 30px;">@item.Item1</label>
             <input type="number" @bind="aprox[item.Item2]" style="width: 50px; height: 30px;"/>
-            <br/>
             <div style="width: 20px;"></div>
         }
+        
     </div>
 }
 
@@ -129,11 +161,19 @@
 
     private bool _expression = false;
 
+    private int cant=1;
+
     private bool _selectVector;
+
+    private double a=0;
+
+    private double b=1;
 
     private string s = "";
 
     private double[] aprox = Array.Empty<double>();
+
+    private double[] radio=Array.Empty<double>();
 
     private string ExpressionValue { get; set; } = "";
 
@@ -143,18 +183,33 @@
 
     private void Derivate()
     {
-        Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
+        try
+        {
+            Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
         Expression expression = func.Derivate(VariableToDerivate).Evaluate(new Dictionary<char, double>());
         ExpressionDerivate = expression.ToString(Gui.less_priority);
+
+        }
+        catch
+        {
+            ExpressionDerivate="Su expresion es incorrecta";
+        }
     }
 
     private void Integrate()
     {
-        ExpressionIntegral = "";
+        try
+        {
+            ExpressionIntegral = "";
         Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
-        double answer = IntegralDefinida.Integra(func, 0, 1);
+        double answer = IntegralDefinida.Integra(func, a, b,Variables);
         Console.WriteLine(answer);
         ExpressionIntegral = answer.ToString();
+        }
+        catch
+        {
+            ExpressionDerivate="Su expresion es incorrecta";
+        }
     }
 
 
@@ -163,6 +218,7 @@
         int first = Variables.Count;
         Variables = Gui.DeterminateVariables(ExpressionValue);
         aprox = new double[Variables.Count];
+        radio =new double[Variables.Count];
         int after = Variables.Count;
         ExpressionDerivate = "";
         ExpressionTaylor = "";
@@ -170,22 +226,22 @@
         ExpressionTaylorTotal = "";
         ExpressionIntegral = "";
 
-        // if (after > first) aprox.Add(0);
-        // else if (first > after) aprox.RemoveAt(aprox.Count - 1);
     }
 
     private void Taylor()
     {
-        _selectVector = false;
+        try
+        {
+            _selectVector = false;
         Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
 
-        Taylor result = new Taylor(func);
+        Taylor result = new Taylor(func,radio);
 
         double[] n = aprox;
 
-        string total = result.Evaluate(5, n).ToString(Gui.less_priority);
-        IEnumerable<Expression> nsn = result.N_Terms(5);
-        IEnumerable<Expression> sum = result.N_Terms(5,n);
+        string total = result.Evaluate(cant, n).ToString(Gui.less_priority);
+        IEnumerable<Expression> nsn = result.N_Terms(cant);
+        IEnumerable<Expression> sum = result.N_Terms(cant,n);
 
         ExpressionTaylorN = nsn.First().ToString(Gui.less_priority);
 
@@ -202,6 +258,11 @@
         }
 
         ExpressionTaylorTotal = total;
+        }
+        catch
+        {
+            ExpressionDerivate="Su expresion es incorrecta";
+        }
 
     }
 
