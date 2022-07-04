@@ -11,7 +11,7 @@
 
         @if(ExpressionValue!="")
         {
-            <button type="default" class="btn-eliminate" @onclick="()=>{ExpressionValue=s; ExpressionDerivate=s;ExpressionTaylor=s;}">⨯</button>
+            <button type="default" class="btn-eliminate" @onclick="()=>{ExpressionValue=s; ExpressionDerivate=s;ExpressionTaylor=s;ExpressionIntegral=s;}">⨯</button>
         }
         else
         {
@@ -28,13 +28,14 @@
 
  
 <button type ="button"   class="btn-primary" @onclick="Taylor" >Aproximacion en (@Print(aprox)) de la funcion por Taylor</button>
-@for(int i = 0; i<Variables.Count; i++)
-{
-  
-    <button type ="button"   class="btn-primary" @onclick="()=> {aprox[i] ++;}" >/\</button>
-<button type ="button"   class="btn-primary" @onclick="()=> {aprox[i] --;}" >\/</button>
 
-}
+ <div>
+     <button type ="button"   class="btn-primary" @onclick="()=> {aprox[aprox.Count -1] ++;}" >/\</button>
+     <button type ="button"   class="btn-primary" @onclick="()=> {aprox[aprox.Count -1] --;}" >\/</button>
+ </div>    
+
+ <button type ="button"   class="btn-primary" @onclick="Integrate" >Integrar de 0 a 1</button>
+
 
 
 <div style="display: flex; justify-content: center;">
@@ -72,11 +73,22 @@
     <label>@ExpressionTaylor</label>
 </div>
 
+@if(ExpressionIntegral!="")
+{
+    <div style="display: flex; justify-content: center;">
+        <h5>Integral</h5>
+    </div>
+}
+
+<div style="display: flex; justify-content: center;">
+    <label>@ExpressionIntegral</label>
+</div>
 
 @code
 {
     private string ExpressionDerivate { get; set; } = "";
     private string ExpressionTaylor { get; set; } = ""; 
+    private string ExpressionIntegral { get; set; } = ""; 
 
     private string s = "";
     private List<double> aprox = new List<double>(); 
@@ -92,17 +104,27 @@
         Expression expression = func.Derivate(VariableToDerivate).Evaluate(new Dictionary<char, double>());
         ExpressionDerivate = expression.ToString(Gui.less_priority);
     }
+    private void Integrate()
+    {
+        ExpressionIntegral = "";
+        Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
+        double answer = IntegralDefinida.Integra(func, 0, 1);
+        Console.WriteLine(answer);
+        ExpressionIntegral = answer.ToString();
 
+    }
     private void DeterminateVariables()
     {
+        int first = Variables.Count;
         Variables = Gui.DeterminateVariables(ExpressionValue);
+        int after = Variables.Count;
         ExpressionDerivate = "";
         ExpressionTaylor = "";
-        aprox = new List<double>();
-        foreach(var x in Variables)
-        {
-            aprox.Add(0);
-        }
+        ExpressionIntegral = "";
+
+        if (after > first) aprox.Add(0);
+        else if(first > after) aprox.RemoveAt(aprox.Count - 1);
+
     }
     private void Taylor()
     {
@@ -121,12 +143,7 @@
     }
     private string Print(List<double> x)
     {
-        string result = "";
-        foreach(var num in x)
-        {
-            result += num + ",";
-        }
-        return result;
+         return String.Join(",", x);
     }
 
 }
