@@ -387,7 +387,7 @@
         }
 
     }
-
+  
     public class Minus : BinaryExpression
     {
         public Minus(string visual, Expression left, Expression right) : base(visual, left, right)

@@ -14,5 +14,15 @@ namespace ExpressionCalculator
             }
             return Double.Parse(answer.ToString());
         }
+        // public double SumaStg(string string1,string string2)
+        // {
+        //     List<char> char1=string1.ToCharArray().ToList();
+        //     List<char> char2=string2.ToCharArray().ToList();
+        //     int index1=char1.IndexOf(',');
+        //     int index2=char2.IndexOf(',');
+            
+
+
+        // }
     }
 }
