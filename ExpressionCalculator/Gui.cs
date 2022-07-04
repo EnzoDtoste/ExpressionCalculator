@@ -42,9 +42,9 @@ public class Gui
         "arcsec", "arccsc", "e", "pi"
     };
 
-    public static List<char> DeterminateVariables(string s)
+    public static List<(char,int)> DeterminateVariables(string s)
     {
-        List<char> variables = new List<char>();
+        List<(char,int)> variables = new List<(char,int)>();
         bool[] visited = new bool[256];
         for (int i = 0; i < s.Length; i++)
         {
@@ -65,7 +65,7 @@ public class Gui
 
                 if (isVariable && !visited[s[i]])
                 {
-                    variables.Add(s[i]);
+                    variables.Add((s[i],variables.Count));
                     visited[s[i]] = true;
                 }
             }
