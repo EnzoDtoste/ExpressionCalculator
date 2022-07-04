@@ -16,10 +16,10 @@ Estas se definen de modo que dada la entrada por el usuario en string puedan ser
 
 ## Derivación
 
-La derivación es un concepto esencial para determinar los espacion tangentes sobre determinadas variedades diferenciable, sus cualidades, propiedades y consecuencias.Se aplica e aquellos casos en que es necesario medir la rapidez con que se produce el cambio de una magnitud o situación y es una herramienta de cálculo fundamental en los estudios de Física, Química y Biología.
-Para la derivación de los distintos tipos de expresiones se aplican las reglas principales del calculo de derivadas y la forma particular en que deriva cada una.
+La derivación es un concepto esencial para determinar los espacios tangentes sobre determinadas variedades diferenciable, sus cualidades, propiedades y consecuencias.Se aplica e aquellos casos en que es necesario medir la rapidez con que se produce el cambio de una magnitud o situación y es una herramienta de cálculo fundamental en los estudios de Física, Química y Biología.
+Para la derivación de los distintos tipos de expresiones se aplican las reglas principales del cálculo de derivadas y la forma particular en que deriva cada una.
 
-Observese como las expresiones que son constantes derivan como 0:
+Obsérvese como las expresiones que son constantes derivan como 0:
 
 ```cs
  public override Expression Derivate(char variable)
@@ -53,7 +53,7 @@ Para la multiplicación se suma la derivada del miembro izquierdo por el derecho
 
 ```
 
-En la división  la derivada del numerador por el denominador restado con el numerador por la derivada del denominador y tod esto se divide  por el denominador al cuadrado:
+En la división  la derivada del numerador por el denominador restado con el numerador por la derivada del denominador y todo esto se divide  por el denominador al cuadrado:
 
 ```cs
  public override Expression Derivate(char variable)
