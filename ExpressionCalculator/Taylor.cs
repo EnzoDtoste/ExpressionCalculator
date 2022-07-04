@@ -92,7 +92,7 @@ namespace ExpressionCalculator
                 }
 
                 //voy sumando
-                sum = new Sum("+", sum, mult.Evaluate(values));
+                sum = new Sum("+", sum, mult);
             }
 
             List<Expression> ders = new List<Expression>();
