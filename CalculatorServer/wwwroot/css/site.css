@@ -108,3 +108,29 @@ a, .btn-link {
         height:40px;
         width: 50px;
     }
+    
+    .InputSelect{
+        width: 40px; height: 30px; border-bottom-right-radius: 10px; border-top-right-radius: 10px;
+        background-color: #fff;
+        border-top: groove 2px;
+        border-bottom: groove 2px;
+        border-right: groove 2px;
+        border-left: 0;
+        outline: none;
+    }
+    .Derivate1 {
+        width: 160px; height: 30px; border-bottom-left-radius: 10px; border-top-left-radius: 10px;
+        background-color: #fff;
+        
+        border-top: groove 2px;
+        border-bottom: groove 2px;
+        border-left: groove 2px;
+        border-right: 0;
+    }
+    
+    .Derivate2{
+        width: 200px; height: 30px; border-radius: 10px; 
+        background-color: #fff;
+
+        border: groove 2px;
+    }
