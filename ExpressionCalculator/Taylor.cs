@@ -26,6 +26,8 @@ namespace ExpressionCalculator
         //variables de la función
         List<char> vars;
 
+        List<Expression> terms = new List<Expression>();
+
         public Taylor(Expression function)
         {
             values = new Dictionary<char, double>();
@@ -71,7 +73,7 @@ namespace ExpressionCalculator
         }
 
         //Próximo valor de la serie
-        public Expression NextValue(double[] value)
+        public Expression NextValue()
         {
             //inicializo suma
             Expression sum = new ConstantOrVariable("0");
@@ -86,7 +88,7 @@ namespace ExpressionCalculator
                 for (int j = 0; j < center.Length; j++)
                 {
                     mult = new Multiply("*", mult,
-                        new ConstantOrVariable(Math.Pow(value[j] - center[j], exps[i][j]).ToString()));
+                        new Exponent("^", new Minus("-", new ConstantOrVariable(vars[j].ToString()), new ConstantOrVariable(center[j].ToString())), new ConstantOrVariable(exps[i][j].ToString())));
                 }
 
                 //voy sumando
@@ -134,16 +136,34 @@ namespace ExpressionCalculator
         /// <returns></returns>
         public Expression Evaluate(int n, double[] value)
         {
+
+            if (n > terms.Count)
+            {
+
+                for (int i = terms.Count; i < n; i++)
+                {
+                    terms.Add(NextValue());
+                }
+
+            }
+
             //inicializo suma
             Expression sum = new ConstantOrVariable("0");
 
             //sumatoria de los términos
-            for (int i = 0; i < n; i++)
+            foreach(var term in terms.Take(n))
             {
-                sum = new Sum("+", sum, NextValue(value));
+                sum = new Sum("+", sum, term);
             }
 
-            return sum.Evaluate(new Dictionary<char, double>());
+            Dictionary<char, double> d = new Dictionary<char, double>();
+
+            for(int i = 0; i < vars.Count; i++)
+            {
+                d.Add(vars[i], value[i]);
+            }
+
+            return sum.Evaluate(d);
         }
 
         /// <summary>
@@ -152,12 +172,49 @@ namespace ExpressionCalculator
         /// <param name="n"></param>
         /// <param name="value"></param>
         /// <returns></returns>
+        public IEnumerable<Expression> N_Terms(int n)
+        {
+
+            if(n > terms.Count)
+            {
+
+                for (int i = terms.Count; i < n; i++)
+                {
+                    terms.Add(NextValue());
+                }
+
+            }
+
+            return terms.AsEnumerable().Take(n);
+            
+        }
+
         public IEnumerable<Expression> N_Terms(int n, double[] value)
         {
-            for (int i = 0; i < n; i++)
+
+            if (n > terms.Count)
             {
-                yield return NextValue(value);
+
+                for (int i = terms.Count; i < n; i++)
+                {
+                    terms.Add(NextValue());
+                }
+
             }
+
+            Dictionary<char, double> d = new Dictionary<char, double>();
+
+            for (int i = 0; i < vars.Count; i++)
+            {
+                d.Add(vars[i], value[i]);
+            }
+
+            foreach(var term in terms.Take(n))
+            {
+                yield return term.Evaluate(d);
+            }
+
         }
+
     }
 }
