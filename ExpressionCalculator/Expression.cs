@@ -390,16 +390,16 @@
             Expression newLeft = left.Evaluate(variables);
             Expression newRight = right.Evaluate(variables);
 
-            //si son constantes sumo
-            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
-                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) + double.Parse(newRight.visual.ToString())).ToString());
-
             //reduzco
             if (newLeft.visual == "0")
                 return newRight;
 
             if (newRight.visual == "0")
                 return newLeft;
+
+            //si son constantes sumo
+            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
+                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) + double.Parse(newRight.visual.ToString())).ToString());
 
             return new Sum("+", newLeft, newRight);
 
@@ -431,14 +431,14 @@
             Expression newLeft = left.Evaluate(variables);
             Expression newRight = right.Evaluate(variables);
 
-            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
-                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) - double.Parse(newRight.visual.ToString())).ToString());
-
             if (newLeft.visual == "0")
                 return new Multiply("*", new ConstantOrVariable("-1"), newRight);
 
             if (newRight.visual == "0")
                 return newLeft;
+
+            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
+                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) - double.Parse(newRight.visual.ToString())).ToString());
 
             return new Minus("-", newLeft, newRight);
 
@@ -585,11 +585,11 @@
             if (newRight.visual == "0")
                 throw new ArgumentException("Cannot divide by zero");
 
-            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
-                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) / double.Parse(newRight.visual.ToString())).ToString());
-
             if (newLeft.visual == "0")
                 return new ConstantOrVariable("0");
+
+            if (!IsVariable(newLeft.visual) && !IsVariable(newRight.visual))
+                return new ConstantOrVariable((double.Parse(newLeft.visual.ToString()) / double.Parse(newRight.visual.ToString())).ToString());
 
             if (newRight.visual == "1")
                 return newLeft;

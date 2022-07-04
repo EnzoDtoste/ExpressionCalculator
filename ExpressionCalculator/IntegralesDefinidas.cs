@@ -13,8 +13,9 @@ namespace ExpressionCalculator
             }
 
             aux.Add('e', double.Parse(new Taylor(Expression.CreateExpression("e^x", Gui.operators, Gui.less_priority)).Evaluate(34, new double[] {1}).ToString(Gui.less_priority)));
+            aux.Add('ñ', Math.PI);
 
-            for (double i = inf; i <= sup; i = i + (double)1 / (double)100000)
+            for (double i = inf; i < sup; i = i + (double)1 / (double)100000)
             {
 
                 aux[variables[0].Item1] = i;
