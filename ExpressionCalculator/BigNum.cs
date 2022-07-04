@@ -2,6 +2,7 @@
 
 public class BigNum
 {
+    
     private string _numero;
     public BigNum(string s)
     {
