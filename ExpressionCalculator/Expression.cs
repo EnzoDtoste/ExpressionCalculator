@@ -1247,7 +1247,7 @@
 
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
-            throw new NotImplementedException();
+            return new Arcsen("arcsen", new Divide("/", new ConstantOrVariable("1"), new Root("root", new ConstantOrVariable("2"), new Sum("+", new ConstantOrVariable("1"), new Exponent("^", content, new ConstantOrVariable("2")))))).Evaluate(variables);
         }
 
     }
@@ -1266,7 +1266,7 @@
 
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
-            throw new NotImplementedException();
+            return new Arcsen("arcsen", new Divide("/", new Root("root", new ConstantOrVariable("2"), new Minus("-", new Exponent("^", content, new ConstantOrVariable("2"), new ConstantOrVariable("1")))), content)).Evaluate(variables);
         }
     }
 
@@ -1283,7 +1283,7 @@
 
         public override Expression Evaluate(Dictionary<char, double> variables)
         {
-            throw new NotImplementedException();
+            return new Arcsen("arcsen", new Divide("/", new ConstantOrVariable("1"), content));
         }
     }
 
