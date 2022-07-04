@@ -127,6 +127,16 @@ a, .btn-link {
         border-left: groove 2px;
         border-right: 0;
     }
+
+.Derivate1R {
+    width: 160px; height: 30px; border-bottom-right-radius: 10px; border-top-right-radius: 10px;
+    background-color: #fff;
+
+    border-top: groove 2px;
+    border-bottom: groove 2px;
+    border-right: groove 2px;
+    border-left: 0;
+}
     
     .Derivate2{
         width: 200px; height: 30px; border-radius: 10px; 
