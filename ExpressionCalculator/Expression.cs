@@ -5,6 +5,7 @@
     {
         //indicador de operación, constante o variable
         public string visual;
+
         protected Expression(string visual)
         {
             this.visual = visual;

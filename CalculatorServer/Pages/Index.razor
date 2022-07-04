@@ -205,9 +205,8 @@
         {
             ExpressionIntegral = "";
             Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
-            double answer = IntegralDefinida.Integra(func, a, b,Variables);
-            Console.WriteLine(answer);
-            ExpressionIntegral = answer.ToString();
+            string answer = IntegralDefinida.Integra(func, a, b,Variables).ToString(Gui.less_priority);
+            ExpressionIntegral = answer;
         }
         catch
         {
