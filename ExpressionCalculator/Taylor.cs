@@ -32,7 +32,7 @@ namespace ExpressionCalculator
         {
             values = new Dictionary<char, double>();
 
-            vars = function.GetVariables(new List<char>() {'e'});
+            vars = function.GetVariables(new List<char>() {'e', 'ñ'});
 
             //centro 0
             foreach (char var in vars)
@@ -51,12 +51,12 @@ namespace ExpressionCalculator
         //centro específico
         public Taylor(Expression function, double[] center)
         {
-            if (center.Length != function.GetVariables(new List<char>() {'e'}).Count)
+            if (center.Length != function.GetVariables(new List<char>() {'e', 'ñ'}).Count)
                 throw new ArgumentException("Invalid Vector X0");
 
             values = new Dictionary<char, double>();
 
-            vars = function.GetVariables(new List<char>() {'e'});
+            vars = function.GetVariables(new List<char>() {'e', 'ñ'});
 
             //centro especificado
             for (int i = 0; i < vars.Count; i++)

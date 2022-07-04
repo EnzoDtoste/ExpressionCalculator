@@ -39,7 +39,7 @@ public class Gui
     public static List<string> Languaje = new List<string>()
     {
         "ln", "log", "!", "root", "sen", "cos", "tan", "cot", "sec", "csc", "arcsen", "arccos", "arctan", "arccot",
-        "arcsec", "arccsc", "e", "pi"
+        "arcsec", "arccsc", "e", "ñ"
     };
 
     public static List<(char,int)> DeterminateVariables(string s)
