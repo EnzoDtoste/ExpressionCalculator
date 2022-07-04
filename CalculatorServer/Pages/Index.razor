@@ -18,7 +18,7 @@
             <button type="default" class="btn-eliminate"></button>
         }
 
-        <button type="default" class="btn-search"  @onclick="Derivate" >d(x)</button>
+        <button type="default" class="btn-search"  @onclick="Derivate"> df </button>
         
     </div>
     
@@ -113,6 +113,7 @@
         ExpressionIntegral = answer.ToString();
 
     }
+
     private void DeterminateVariables()
     {
         int first = Variables.Count;
@@ -129,17 +130,20 @@
     private void Taylor()
     {
         Expression func = Expression.CreateExpression(ExpressionValue, Gui.operators, Gui.less_priority);
-        ExpressionTaylor = "";
+        
 
         Taylor result = new Taylor(func);
         double[] n = aprox.ToArray();
 
         IEnumerable<Expression> sum = result.N_Terms(5,n);
-        foreach(var exp in sum)
-        {
 
+        ExpressionTaylor = sum.First().ToString();
+
+        foreach(var exp in sum.Skip(1))
+        {
             ExpressionTaylor += " + " + exp.ToString(Gui.less_priority);
         }
+
     }
     private string Print(List<double> x)
     {
